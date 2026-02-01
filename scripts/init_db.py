@@ -10,10 +10,11 @@ from decimal import Decimal
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from backend.database import engine, Base, SessionLocal
-from backend.models import (
-    Company, StockPrice, StockSplit, Dividend,
-    Index, IndexConstituent, FinancialFact, ValuationMetric
-)
+from backend.models.company import Company
+from backend.models.prices import StockPrice, StockSplit, Dividend
+from backend.models.indices import Index, IndexConstituent
+from backend.models.filings import FinancialFact
+from backend.models.metrics import ValuationMetric
 
 
 def init_db():
@@ -135,6 +136,89 @@ def seed_demo_data():
                 close=Decimal(str(p[6])),
                 adj_close=Decimal(str(p[7])),
                 volume=p[8],
+            ))
+        
+        # Financial facts for time series calculations
+        # Apple: ~$390B revenue TTM, ~$100B net income TTM, 15.2B shares
+        financial_data = [
+            # (company_id, cik, concept, value, unit, period_end, fiscal_year, fiscal_period)
+            # AAPL
+            (1, "0000320193", "Revenues", 95000000000, "USD", "2025-09-30", 2025, "Q4"),
+            (1, "0000320193", "Revenues", 85000000000, "USD", "2025-06-30", 2025, "Q3"),
+            (1, "0000320193", "Revenues", 90000000000, "USD", "2025-03-31", 2025, "Q2"),
+            (1, "0000320193", "Revenues", 120000000000, "USD", "2024-12-31", 2025, "Q1"),
+            (1, "0000320193", "NetIncomeLoss", 25000000000, "USD", "2025-09-30", 2025, "Q4"),
+            (1, "0000320193", "NetIncomeLoss", 22000000000, "USD", "2025-06-30", 2025, "Q3"),
+            (1, "0000320193", "NetIncomeLoss", 24000000000, "USD", "2025-03-31", 2025, "Q2"),
+            (1, "0000320193", "NetIncomeLoss", 33000000000, "USD", "2024-12-31", 2025, "Q1"),
+            (1, "0000320193", "CommonStockSharesOutstanding", 15200000000, "shares", "2025-09-30", 2025, "Q4"),
+            (1, "0000320193", "LongTermDebt", 98000000000, "USD", "2025-09-30", 2025, "Q4"),
+            (1, "0000320193", "CashAndCashEquivalentsAtCarryingValue", 30000000000, "USD", "2025-09-30", 2025, "Q4"),
+            (1, "0000320193", "OperatingIncomeLoss", 30000000000, "USD", "2025-09-30", 2025, "Q4"),
+            (1, "0000320193", "OperatingIncomeLoss", 26000000000, "USD", "2025-06-30", 2025, "Q3"),
+            (1, "0000320193", "OperatingIncomeLoss", 28000000000, "USD", "2025-03-31", 2025, "Q2"),
+            (1, "0000320193", "OperatingIncomeLoss", 38000000000, "USD", "2024-12-31", 2025, "Q1"),
+            # NVDA
+            (2, "0001045810", "Revenues", 35000000000, "USD", "2025-10-31", 2026, "Q3"),
+            (2, "0001045810", "Revenues", 30000000000, "USD", "2025-07-31", 2026, "Q2"),
+            (2, "0001045810", "Revenues", 26000000000, "USD", "2025-04-30", 2026, "Q1"),
+            (2, "0001045810", "Revenues", 22000000000, "USD", "2025-01-31", 2025, "Q4"),
+            (2, "0001045810", "NetIncomeLoss", 19500000000, "USD", "2025-10-31", 2026, "Q3"),
+            (2, "0001045810", "NetIncomeLoss", 17000000000, "USD", "2025-07-31", 2026, "Q2"),
+            (2, "0001045810", "NetIncomeLoss", 15000000000, "USD", "2025-04-30", 2026, "Q1"),
+            (2, "0001045810", "NetIncomeLoss", 12500000000, "USD", "2024-01-31", 2025, "Q4"),
+            (2, "0001045810", "CommonStockSharesOutstanding", 24500000000, "shares", "2025-10-31", 2026, "Q3"),
+            (2, "0001045810", "LongTermDebt", 9000000000, "USD", "2025-10-31", 2026, "Q3"),
+            (2, "0001045810", "CashAndCashEquivalentsAtCarryingValue", 8500000000, "USD", "2025-10-31", 2026, "Q3"),
+            (2, "0001045810", "OperatingIncomeLoss", 22000000000, "USD", "2025-10-31", 2026, "Q3"),
+            (2, "0001045810", "OperatingIncomeLoss", 19000000000, "USD", "2025-07-31", 2026, "Q2"),
+            (2, "0001045810", "OperatingIncomeLoss", 17000000000, "USD", "2025-04-30", 2026, "Q1"),
+            (2, "0001045810", "OperatingIncomeLoss", 14000000000, "USD", "2025-01-31", 2025, "Q4"),
+            # TSLA
+            (3, "0001318605", "Revenues", 25000000000, "USD", "2025-09-30", 2025, "Q3"),
+            (3, "0001318605", "Revenues", 26000000000, "USD", "2025-06-30", 2025, "Q2"),
+            (3, "0001318605", "Revenues", 21000000000, "USD", "2025-03-31", 2025, "Q1"),
+            (3, "0001318605", "Revenues", 25000000000, "USD", "2024-12-31", 2024, "Q4"),
+            (3, "0001318605", "NetIncomeLoss", 2200000000, "USD", "2025-09-30", 2025, "Q3"),
+            (3, "0001318605", "NetIncomeLoss", 1800000000, "USD", "2025-06-30", 2025, "Q2"),
+            (3, "0001318605", "NetIncomeLoss", 1100000000, "USD", "2025-03-31", 2025, "Q1"),
+            (3, "0001318605", "NetIncomeLoss", 2500000000, "USD", "2024-12-31", 2024, "Q4"),
+            (3, "0001318605", "CommonStockSharesOutstanding", 3200000000, "shares", "2025-09-30", 2025, "Q3"),
+            (3, "0001318605", "LongTermDebt", 5000000000, "USD", "2025-09-30", 2025, "Q3"),
+            (3, "0001318605", "CashAndCashEquivalentsAtCarryingValue", 18000000000, "USD", "2025-09-30", 2025, "Q3"),
+            (3, "0001318605", "OperatingIncomeLoss", 2600000000, "USD", "2025-09-30", 2025, "Q3"),
+            (3, "0001318605", "OperatingIncomeLoss", 2200000000, "USD", "2025-06-30", 2025, "Q2"),
+            (3, "0001318605", "OperatingIncomeLoss", 1400000000, "USD", "2025-03-31", 2025, "Q1"),
+            (3, "0001318605", "OperatingIncomeLoss", 2800000000, "USD", "2024-12-31", 2024, "Q4"),
+            # NFLX
+            (4, "0001065280", "Revenues", 10500000000, "USD", "2025-09-30", 2025, "Q3"),
+            (4, "0001065280", "Revenues", 9800000000, "USD", "2025-06-30", 2025, "Q2"),
+            (4, "0001065280", "Revenues", 9500000000, "USD", "2025-03-31", 2025, "Q1"),
+            (4, "0001065280", "Revenues", 10200000000, "USD", "2024-12-31", 2024, "Q4"),
+            (4, "0001065280", "NetIncomeLoss", 2100000000, "USD", "2025-09-30", 2025, "Q3"),
+            (4, "0001065280", "NetIncomeLoss", 1900000000, "USD", "2025-06-30", 2025, "Q2"),
+            (4, "0001065280", "NetIncomeLoss", 1800000000, "USD", "2025-03-31", 2025, "Q1"),
+            (4, "0001065280", "NetIncomeLoss", 2000000000, "USD", "2024-12-31", 2024, "Q4"),
+            (4, "0001065280", "CommonStockSharesOutstanding", 430000000, "shares", "2025-09-30", 2025, "Q3"),
+            (4, "0001065280", "LongTermDebt", 14000000000, "USD", "2025-09-30", 2025, "Q3"),
+            (4, "0001065280", "CashAndCashEquivalentsAtCarryingValue", 7500000000, "USD", "2025-09-30", 2025, "Q3"),
+            (4, "0001065280", "OperatingIncomeLoss", 2800000000, "USD", "2025-09-30", 2025, "Q3"),
+            (4, "0001065280", "OperatingIncomeLoss", 2500000000, "USD", "2025-06-30", 2025, "Q2"),
+            (4, "0001065280", "OperatingIncomeLoss", 2400000000, "USD", "2025-03-31", 2025, "Q1"),
+            (4, "0001065280", "OperatingIncomeLoss", 2600000000, "USD", "2024-12-31", 2024, "Q4"),
+        ]
+        
+        for f in financial_data:
+            db.add(FinancialFact(
+                company_id=f[0],
+                cik=f[1],
+                taxonomy="us-gaap",
+                concept=f[2],
+                value=Decimal(str(f[3])),
+                unit=f[4],
+                period_end=date.fromisoformat(f[5]),
+                fiscal_year=f[6],
+                fiscal_period=f[7],
             ))
         
         # Valuation metrics

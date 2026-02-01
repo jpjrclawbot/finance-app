@@ -506,7 +506,7 @@ def main():
     
     page = st.sidebar.radio(
         "Navigation",
-        ["Overview", "Stock Detail", "Screener"],
+        ["Overview", "Stock Detail", "Valuation Trends", "Screener"],
         index=0,
     )
     
@@ -524,6 +524,11 @@ def main():
             render_stock_detail(ticker)
         else:
             st.warning("No companies in database.")
+    
+    elif page == "Valuation Trends":
+        # Import and render trends page
+        from pages.trends import main as trends_main
+        trends_main()
     
     elif page == "Screener":
         render_screener()

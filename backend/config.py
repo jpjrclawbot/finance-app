@@ -1,14 +1,19 @@
 """Application configuration."""
 
 from functools import lru_cache
+from pathlib import Path
 from pydantic_settings import BaseSettings
+
+
+# Default to SQLite in project directory for easy demo
+DEFAULT_DB = f"sqlite:///{Path(__file__).parent.parent}/data/finance.db"
 
 
 class Settings(BaseSettings):
     """App settings loaded from environment variables."""
     
-    # Database
-    database_url: str = "postgresql://localhost/finance_app"
+    # Database (defaults to SQLite for demo, use PostgreSQL for production)
+    database_url: str = DEFAULT_DB
     
     # API settings
     api_host: str = "0.0.0.0"

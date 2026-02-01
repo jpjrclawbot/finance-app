@@ -3,7 +3,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from backend.api import stocks, filings
+from backend.api import stocks, filings, indices, metrics
 from backend.config import get_settings
 
 settings = get_settings()
@@ -26,6 +26,8 @@ app.add_middleware(
 # Include routers
 app.include_router(stocks.router, prefix="/api/stocks", tags=["stocks"])
 app.include_router(filings.router, prefix="/api/filings", tags=["filings"])
+app.include_router(indices.router, prefix="/api/indices", tags=["indices"])
+app.include_router(metrics.router, prefix="/api/metrics", tags=["metrics"])
 
 
 @app.get("/")

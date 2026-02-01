@@ -16,6 +16,8 @@ from backend.models.indices import Index, IndexConstituent
 from backend.models.filings import FinancialFact
 from backend.models.metrics import ValuationMetric
 
+# Need to import Index for query
+
 
 def init_db():
     """Create all tables."""
@@ -47,17 +49,19 @@ def seed_demo_data():
         db.add_all(companies)
         db.flush()
         
-        # S&P 500 Index
-        sp500 = Index(id=1, symbol="^GSPC", name="S&P 500")
-        db.add(sp500)
-        db.flush()
+        # S&P 500 Index - get existing or it was created by schema
+        sp500 = db.query(Index).filter(Index.symbol == "^GSPC").first()
+        if not sp500:
+            sp500 = Index(symbol="^GSPC", name="S&P 500")
+            db.add(sp500)
+            db.flush()
         
         # Index Constituents
         constituents = [
-            IndexConstituent(index_id=1, company_id=1, ticker="AAPL", added_date=date(1982, 11, 30)),
-            IndexConstituent(index_id=1, company_id=2, ticker="NVDA", added_date=date(2001, 11, 30)),
-            IndexConstituent(index_id=1, company_id=3, ticker="TSLA", added_date=date(2020, 12, 21)),
-            IndexConstituent(index_id=1, company_id=4, ticker="NFLX", added_date=date(2010, 12, 20)),
+            IndexConstituent(index_id=sp500.id, company_id=1, ticker="AAPL", added_date=date(1982, 11, 30)),
+            IndexConstituent(index_id=sp500.id, company_id=2, ticker="NVDA", added_date=date(2001, 11, 30)),
+            IndexConstituent(index_id=sp500.id, company_id=3, ticker="TSLA", added_date=date(2020, 12, 21)),
+            IndexConstituent(index_id=sp500.id, company_id=4, ticker="NFLX", added_date=date(2010, 12, 20)),
         ]
         db.add_all(constituents)
         

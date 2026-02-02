@@ -217,7 +217,14 @@ class TimeSeriesService:
             if not shares:
                 continue
             
-            price_val = float(price.close)
+            # NOTE on splits: Yahoo Finance history() returns split-adjusted prices
+            # in BOTH the Close and Adj Close columns. The SEC filing shares are also
+            # restated post-split in annual filings. So using latest shares + adj_close
+            # should give consistent market cap calculations.
+            #
+            # P/E = Market Cap / Net Income avoids per-share issues entirely.
+            price_val = float(price.adj_close) if price.adj_close else float(price.close)
+            
             market_cap = price_val * shares
             enterprise_value = market_cap + total_debt - cash
             

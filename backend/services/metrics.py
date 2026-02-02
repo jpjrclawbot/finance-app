@@ -121,14 +121,17 @@ class MetricsService:
             metrics["revenue_ttm"] = int(revenue)
             metrics["ps_ratio"] = float(market_cap / revenue)
         
-        # Net Income / EPS
+        # Net Income - Use Market Cap / Net Income for P/E (avoids split issues)
+        # NOTE: We intentionally DON'T calculate EPS from SEC data because
+        # per-share metrics from filings aren't split-adjusted consistently.
+        # The SEC restates annual filings post-split but quarterly filings
+        # keep their original values, causing P/E distortions.
         net_income = self.get_ttm_value(company.id, "NetIncomeLoss", as_of)
         if net_income and net_income != 0:
             metrics["net_income_ttm"] = int(net_income)
-            eps = net_income / shares
-            metrics["eps_ttm"] = float(eps)
+            # P/E = Market Cap / Net Income (split-proof formula)
             if net_income > 0:
-                metrics["pe_ratio"] = float(price / eps)
+                metrics["pe_ratio"] = float(market_cap / net_income)
         
         # EBITDA
         ebitda = self.get_ttm_value(company.id, "EBITDA", as_of)
@@ -176,14 +179,14 @@ class MetricsService:
             if net_income:
                 metrics["net_margin"] = float(net_income / revenue)
         
-        # Book Value / P/B
+        # Book Value / P/B - Use Market Cap / Book Value (avoids split issues)
         stockholders_equity = self.get_latest_fact(
             company.id, "StockholdersEquity", as_of
         )
         if stockholders_equity and stockholders_equity > 0:
             metrics["book_value"] = int(stockholders_equity)
-            book_per_share = stockholders_equity / shares
-            metrics["pb_ratio"] = float(price / book_per_share)
+            # P/B = Market Cap / Book Value (split-proof formula)
+            metrics["pb_ratio"] = float(market_cap / stockholders_equity)
         
         # ROE
         if net_income and stockholders_equity and stockholders_equity > 0:

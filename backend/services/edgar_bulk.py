@@ -178,8 +178,41 @@ class EdgarBulkService:
         
         return market_caps
     
+    def load_pregenerated_companies(self) -> list[CompanyInfo]:
+        """Load pre-generated company list from top_companies.json."""
+        companies_file = Path(__file__).parent.parent.parent / "data" / "top_companies.json"
+        
+        if not companies_file.exists():
+            logger.warning(f"Pre-generated company list not found: {companies_file}")
+            return []
+        
+        with open(companies_file) as f:
+            data = json.load(f)
+        
+        companies = []
+        for c in data.get("companies", []):
+            companies.append(CompanyInfo(
+                cik=c["cik"],
+                ticker=c["ticker"],
+                name=c["name"],
+                market_cap=c.get("market_cap", 0),
+            ))
+        
+        logger.info(f"Loaded {len(companies)} companies from pre-generated list")
+        return companies
+    
     def get_top_companies_by_market_cap(self, limit: int = 2500) -> list[CompanyInfo]:
-        """Get top N companies by market cap."""
+        """Get top N companies by market cap. Uses pre-generated list if available."""
+        # Try to use pre-generated list first
+        companies = self.load_pregenerated_companies()
+        
+        if companies:
+            # Already sorted by market cap in the file
+            return companies[:limit]
+        
+        # Fallback to fetching dynamically (slow)
+        logger.info("Falling back to dynamic market cap fetch (this will be slow)...")
+        
         # Get all SEC companies
         all_companies = self.get_all_companies()
         
@@ -355,6 +388,7 @@ class EdgarBulkService:
                     
                 except Exception as e:
                     logger.error(f"Error processing {company.ticker}: {e}")
+                    db.rollback()  # Rollback on error so session stays usable
                     progress["failed"].append({
                         "ticker": company.ticker,
                         "reason": str(e),

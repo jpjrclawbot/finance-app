@@ -1,0 +1,66 @@
+{
+  "generated_at": "2026-02-01T17:50:49.415016",
+  "count": 10,
+  "companies": [
+    {
+      "ticker": "NVDA",
+      "cik": "0001045810",
+      "name": "NVIDIA CORP",
+      "market_cap": 4653442400256
+    },
+    {
+      "ticker": "GOOGL",
+      "cik": "0001652044",
+      "name": "Alphabet Inc.",
+      "market_cap": 4096719323136
+    },
+    {
+      "ticker": "GOOG",
+      "cik": "0001652044",
+      "name": "Alphabet Inc.",
+      "market_cap": 4086677897216
+    },
+    {
+      "ticker": "AAPL",
+      "cik": "0000320193",
+      "name": "Apple Inc.",
+      "market_cap": 3813817974784
+    },
+    {
+      "ticker": "MSFT",
+      "cik": "0000789019",
+      "name": "MICROSOFT CORP",
+      "market_cap": 3195174125568
+    },
+    {
+      "ticker": "AMZN",
+      "cik": "0001018724",
+      "name": "AMAZON COM INC",
+      "market_cap": 2558168662016
+    },
+    {
+      "ticker": "META",
+      "cik": "0001326801",
+      "name": "Meta Platforms, Inc.",
+      "market_cap": 1812426522624
+    },
+    {
+      "ticker": "TSLA",
+      "cik": "0001318605",
+      "name": "Tesla, Inc.",
+      "market_cap": 1615084257280
+    },
+    {
+      "ticker": "AVGO",
+      "cik": "0001730168",
+      "name": "Broadcom Inc.",
+      "market_cap": 1570783887360
+    },
+    {
+      "ticker": "BRK-B",
+      "cik": "0001067983",
+      "name": "BERKSHIRE HATHAWAY INC",
+      "market_cap": 1036664111104
+    }
+  ]
+}

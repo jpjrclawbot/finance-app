@@ -12,7 +12,7 @@ class Company(Base):
     
     __tablename__ = "companies"
     
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     cik = Column(String(10), unique=True)  # SEC Central Index Key
     name = Column(String(500), nullable=False)
     ticker = Column(String(20))  # Primary ticker

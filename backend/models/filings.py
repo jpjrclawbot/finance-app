@@ -52,6 +52,11 @@ class FinancialFact(Base):
     instant = Column(Boolean, default=False)
     created_at = Column(DateTime, default=datetime.utcnow)
     
+    # Audit trail - source tracking
+    accession_number = Column(String(50))  # SEC accession number for source filing
+    filing_url = Column(String(1000))  # Direct link to source filing
+    frame = Column(String(20))  # XBRL frame identifier (e.g., CY2023Q1)
+    
     # Relationships
     filing = relationship("SecFiling", back_populates="facts")
     

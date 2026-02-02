@@ -94,7 +94,8 @@ class MetricsService:
         if not price_record:
             return {"error": f"No price data for {ticker}"}
         
-        price = Decimal(str(price_record.close))
+        # Use adj_close for split-adjusted price (falls back to close if not available)
+        price = Decimal(str(price_record.adj_close or price_record.close))
         
         # Get shares outstanding
         shares = self.edgar.get_shares_outstanding(ticker)

@@ -3,6 +3,14 @@ Time series valuation metrics service.
 
 Calculates daily valuation metrics and aggregate weighted averages for bundles.
 
+IMPORTANT - Split Handling:
+- Always use adj_close (split-adjusted) for prices
+- Always use latest shares outstanding (also split-adjusted via SEC restatements)  
+- Never use per-share metrics from SEC filings (EPS) for ratio calculations
+- Calculate P/E as Market Cap / Net Income (not Price / EPS)
+
+See VALUATION_METHODOLOGY.md for detailed explanation.
+
 Key insight: Weighted averages are computed by summing the components, not averaging ratios.
 - Aggregate P/E = Sum(Market Caps) / Sum(Net Incomes)
 - Aggregate EV/Revenue = Sum(EVs) / Sum(Revenues)

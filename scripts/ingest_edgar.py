@@ -63,10 +63,21 @@ def setup_logging(verbose: bool = False):
     return logging.getLogger(__name__)
 
 
+def fetch_html(url: str) -> str:
+    """Fetch HTML with proper headers to avoid 403."""
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"
+    }
+    response = requests.get(url, headers=headers)
+    response.raise_for_status()
+    return response.text
+
+
 def get_sp500_companies() -> list[dict]:
     """Fetch S&P 500 companies from Wikipedia."""
     url = "https://en.wikipedia.org/wiki/List_of_S%26P_500_companies"
-    tables = pd.read_html(url)
+    html = fetch_html(url)
+    tables = pd.read_html(html)
     df = tables[0]
     
     companies = []
@@ -86,7 +97,8 @@ def get_sp400_companies() -> list[dict]:
     """Fetch S&P 400 MidCap companies."""
     url = "https://en.wikipedia.org/wiki/List_of_S%26P_400_companies"
     try:
-        tables = pd.read_html(url)
+        html = fetch_html(url)
+        tables = pd.read_html(html)
         df = tables[0]
         
         ticker_col = "Ticker symbol" if "Ticker symbol" in df.columns else "Symbol"
@@ -109,7 +121,12 @@ def get_sp400_companies() -> list[dict]:
 def get_sec_cik_mapping() -> dict[str, str]:
     """Get ticker to CIK mapping from SEC."""
     url = "https://www.sec.gov/files/company_tickers.json"
-    response = requests.get(url)
+    headers = {
+        "User-Agent": "FinanceApp admin@openclaw.ai",
+        "Accept": "application/json",
+    }
+    response = requests.get(url, headers=headers)
+    response.raise_for_status()
     data = response.json()
     
     mapping = {}
